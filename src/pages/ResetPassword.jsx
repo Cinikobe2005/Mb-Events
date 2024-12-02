@@ -57,7 +57,7 @@ const ResetPassword = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="p-2">
           <Link to="/">
             <img src={logo} alt="logo" className="d-block mx-auto my-2" />
-          </Link>
+          </Link>za
           <h1 className="fs-3">Reset Password</h1>
           <p className="fs-5 my-3 fw-medium">Enter Your New Password</p>
           <div className="position-relative w-100">

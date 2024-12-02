@@ -21,7 +21,7 @@ function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const location = useLocation();
-  const [user, setUser] = useState('JD')
+  const [user, setUser] = useState("JD");
 
   const handleToggle = () => {
     setExpanded(!expanded);
@@ -34,10 +34,15 @@ function Header() {
   const loggedInuser = localStorage.getItem("user");
 
   useEffect(() => {
-    if (token) setIsLoggedIn(true);
-    const who = loggedInuser.split(' ').map((n)=> n.charAt(0).toUpperCase()).join()
-    setUser(who)
-  });
+    if (token) {
+      setIsLoggedIn(true);
+      const who = loggedInuser
+        .split(" ")
+        .map((n) => n.charAt(0).toUpperCase())
+        .join("");
+      setUser(who);
+    }
+  }, []);
 
   return (
     <Navbar expand="lg" className="bg-white header py-3 position-sticky top-0 ">
@@ -86,7 +91,7 @@ function Header() {
                   style={{ top: "80px", left: "-10px" }}
                   className="position-absolute "
                 >
-                  <UserProfileMenu setIsLoggedIn ={setIsLoggedIn} />
+                  <UserProfileMenu setIsLoggedIn={setIsLoggedIn} />
                 </div>
               )}
             </Nav>
