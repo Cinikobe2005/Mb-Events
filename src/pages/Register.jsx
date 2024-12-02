@@ -4,18 +4,19 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ActionBtn from "../components/ActionBtn";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import logo from "../assets/logo.png";
-
 import { registerSchema } from "../utils/formValidator";
-
+import axios from "axios";
+import { toast } from "react-toastify";
 const Register = () => {
   const [show, setShow] = useState(false);
   const [show2, setShow2] = useState(false);
   const toggleShow = () => setShow(!show);
   const toggleShow2 = () => setShow2(!show2);
+  const redirect = useNavigate();
 
   const {
     register,
@@ -25,10 +26,29 @@ const Register = () => {
   } = useForm({
     resolver: yupResolver(registerSchema),
   });
-
-  const onSubmit = (data) => {
+  // post requst to our api
+  const url = "https://mb-events-adedayo.onrender.com/api/v1/register";
+  const onSubmit = async (data) => {
     // Handle form submission logic here
-    console.log(data);
+    // console.log(data)
+    try {
+      const result = await axios.post(url, data);
+      
+      // toast a success message
+      // redirect to the login page
+      if (result.status === 201) {
+        // toast success msg upon creating account
+        toast.success("User Created Successfully", {
+          position: "top-center",
+        });
+        redirect("/login");
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message, {
+        position: "top-center",
+        autoClose: 7000,
+      });
+    }
   };
 
   return (
@@ -132,6 +152,7 @@ const Register = () => {
           content={isSubmitting ? "Signing Up..." : "Sign Up"}
           type="submit"
           className="specialbtn"
+          disable={isSubmitting}
         />
 
         <h2 className="my-3 fs-6">
