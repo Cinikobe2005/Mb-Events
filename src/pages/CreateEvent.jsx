@@ -3,8 +3,11 @@ import Layout from "../components/Layout";
 import { MdCancel, MdLocationPin } from "react-icons/md";
 import ActionBtn from "../components/ActionBtn";
 import SuccessModal from "../components/SuccessModal";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const CreateEvent = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [online, setOnline] = useState(false);
   const [file, setFile] = useState(null);
   const [free, setFree] = useState(false);
@@ -14,7 +17,7 @@ const CreateEvent = () => {
   const [tagInput, setTagInput] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
+    title: "",
     date: "",
     startTime: "",
     endTime: "",
@@ -58,9 +61,11 @@ const CreateEvent = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
-  const handleSubmit = (e) => {
+  const url = "https://mb-events-adedayo.onrender.com/api/v1/events";
+  const token = localStorage.getItem("mb-token");
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const formDataToSend = new FormData();
 
     // Append all formData fields
@@ -78,13 +83,45 @@ const CreateEvent = () => {
     formDataToSend.append("free", free);
     formDataToSend.append("image", file);
 
-
     // Make the API request (you can use fetch/axios here)
+    try {
+      const result = await axios.post(url, formDataToSend, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (result.status === 201) {
+        setShowModal(true);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.response?.data?.message || error?.message);
+    } finally {
+      setIsSubmitting(false);
+      setFree(false);
+      setOnline(false);
+      setImgPreview(null);
+      setFile(null);
+      setFormData({
+        title: "",
+        date: "",
+        startTime: "",
+        endTime: "",
+        location: "",
+        description: "",
+        category: "",
+        regularPrice: "",
+        vipPrice: "",
+      });
+      setTags([]);
+    }
   };
 
   return (
     <Layout>
-      {showModal && <SuccessModal showModal={showModal} />}
+      {showModal && (
+        <SuccessModal showModal={showModal} setShowModal={setShowModal} />
+      )}
       <div className="container my-4">
         <h2 className="fs-4">Create Event</h2>
         <form onSubmit={handleSubmit} encType="multipart/form-data">
@@ -131,22 +168,24 @@ const CreateEvent = () => {
               )}
             </div>
           </div>
-
-          {/* title */}
+          {/* TITLE */}
           <div className="mt-3">
             <label htmlFor="title" className="form-label fs-4 fw-semibold">
               Title
             </label>
+
             <input
+              onChange={handleChange}
               style={{ width: "279px" }}
               required
               id="title"
+              name="title"
               type="text"
+              className="form-control bg-secondary-subtle py-2 shadow-none"
               placeholder="Event Title"
-              className="form-control bg-secondary-subtle pt-2 shadow-none"
+              value={formData.title}
             />
           </div>
-
           {/* Date and Time */}
           <div className="mt-3">
             <label className="form-label fs-4 fw-semibold">
@@ -157,12 +196,13 @@ const CreateEvent = () => {
                 Date
               </label>
               <input
+                value={formData.date}
+                required
                 id="date"
                 type="date"
                 className="form-control shadow-none bg-secondary-subtle py-2"
                 name="date"
                 onChange={handleChange}
-                required
                 style={{ width: "279px" }}
               />
             </div>
@@ -172,12 +212,13 @@ const CreateEvent = () => {
                   Time (Start)
                 </label>
                 <input
+                  required
                   id="start"
                   type="time"
-                  required
                   className="form-control shadow-none bg-secondary-subtle py-2"
                   name="startTime"
                   onChange={handleChange}
+                  value={formData.startTime}
                   style={{ width: "279px" }}
                 />
               </div>
@@ -188,10 +229,10 @@ const CreateEvent = () => {
                 <input
                   type="time"
                   id="end"
-                  required
                   className="form-control shadow-none bg-secondary-subtle py-2"
                   name="endTime"
                   onChange={handleChange}
+                  value={formData.endTime}
                   style={{ width: "279px" }}
                 />
               </div>
@@ -216,6 +257,7 @@ const CreateEvent = () => {
                 placeholder="Enter Location"
                 name="location"
                 disabled={online}
+                value={formData.location}
                 onChange={handleChange}
               />
               <div className="form-check form-check-reverse form-switch">
@@ -248,8 +290,8 @@ const CreateEvent = () => {
               className="form-control bg-secondary-subtle shadow-none"
               rows="12"
               name="description"
-              required
               onChange={handleChange}
+              value={formData.description}
             ></textarea>
           </div>
 
@@ -270,8 +312,8 @@ const CreateEvent = () => {
                   id="category"
                   className="form-select shadow-none border border-1 py-2"
                   name="category"
-                  required
                   onChange={handleChange}
+                  value={formData.category}
                   style={{ width: "241px" }}
                 >
                   <option value="">Category</option>
@@ -357,6 +399,7 @@ const CreateEvent = () => {
                     className="form-control shadow-none bg-secondary-subtle py-2"
                     name="regularPrice"
                     onChange={handleChange}
+                    value={formData.regularPrice}
                     placeholder="Enter Regular Price"
                   />
                 </div>
@@ -372,6 +415,7 @@ const CreateEvent = () => {
                     type="number"
                     className="form-control shadow-none bg-secondary-subtle py-2"
                     name="vipPrice"
+                    value={formData.vipPrice}
                     onChange={handleChange}
                     placeholder="Enter VIP Price"
                   />
@@ -389,7 +433,12 @@ const CreateEvent = () => {
             >
               Cancel
             </button>
-            <ActionBtn type="submit" width={"172px"} content="Create Event" />
+            <ActionBtn
+              type="submit"
+              width={"172px"}
+              content={isSubmitting ? "Creating event...." : "Create Event"}
+              className={isSubmitting ? "bg-secondary" : "specialbtn"}
+            />
           </div>
         </form>
       </div>
