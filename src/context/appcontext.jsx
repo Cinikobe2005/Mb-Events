@@ -22,7 +22,6 @@ const AppProvider = ({ children }) => {
       const result = await axios(
         `${url}?page=${page}&searchTerm=${searchTerm}&location=${locationTerm}&category=${categoryTerm}&price=${priceTerm}`
       );
-      console.log(result);
       setIsLoading(false);
       setEvents(result.data.events);
       setPage(result.data.currentPage);

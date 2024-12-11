@@ -5,7 +5,7 @@ import ConfirmPaymentModal from "./ConfirmPaymentModal";
 import Caution from "./Caution";
 import { toast } from "react-toastify";
 
-const PaymentCard = () => {
+const PaymentCard = ({ price }) => {
   const [showModal, setShowModal] = useState(false);
   const token = localStorage.getItem("mb-token");
 
@@ -18,27 +18,36 @@ const PaymentCard = () => {
         <ConfirmPaymentModal
           showModal={showModal}
           setShowModal={setShowModal}
-          vipPrice={10000}
-          regularPrice={5000}
+          vipPrice={price.vip}
+          regularPrice={price.regular}
+          free={price.free}
         />
       ) : (
         <Caution showModal={showModal} setShowModal={setShowModal} />
       )}
       <h3 className="text-center mb-1">Pricing</h3>
-      <div className="ticket-type mt-4">
-        <span>VIP</span>
+      {price.free ? (
+        <div>
+          <h3 className="fs-5 mt-5">Free Ticket</h3>
+        </div>
+      ) : (
+        <div>
+          <div className="ticket-type mt-4">
+            <span>VIP</span>
 
-        <span className="fw-bolder">NGN 10,000</span>
-      </div>
+            <span className="fw-bolder">NGN {price.vip}</span>
+          </div>
 
-      <div className="ticket-type">
-        <span>Regular</span>
+          <div className="ticket-type">
+            <span>Regular</span>
 
-        <span className="fw-bolder">NGN 5,000</span>
-      </div>
+            <span className="fw-bolder">NGN {price.regular}</span>
+          </div>
+        </div>
+      )}
 
       <ActionBtn
-        content="Proceed To Payment"
+        content={price.free ? "Get Tickets" : "Proceed To Payment"}
         width={"100%"}
         className="herobtn mt-4"
         handleClick={() => setShowModal(true)}

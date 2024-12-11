@@ -27,7 +27,7 @@ const ResetPassword = () => {
 
   const urlParams = new URLSearchParams(location.search);
   const token = urlParams.get("token");
-  console.log({ token });
+  // console.log({ token });
 
   const url = "https://mb-events-adedayo.onrender.com/api/v1/reset-password";
   const onSubmit = async (data) => {
@@ -42,7 +42,6 @@ const ResetPassword = () => {
           redirect("/login");
         }
       } catch (error) {
-        console.log(error);
         toast.error(error?.response?.data?.message || error?.message, {
           position: "top-center",
           autoClose: 7000,
@@ -54,10 +53,14 @@ const ResetPassword = () => {
   return (
     <div>
       <div className="vh-100 d-flex justify-content-center align-items-center reset-container">
-        <form onSubmit={handleSubmit(onSubmit)} className="p-2">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="p-2 position-relative"
+        >
           <Link to="/">
             <img src={logo} alt="logo" className="d-block mx-auto my-2" />
-          </Link>za
+          </Link>
+          za
           <h1 className="fs-3">Reset Password</h1>
           <p className="fs-5 my-3 fw-medium">Enter Your New Password</p>
           <div className="position-relative w-100">
@@ -78,7 +81,6 @@ const ResetPassword = () => {
               <small className="text-danger">{errors.password.message}</small>
             )}
           </div>
-
           <div className="position-relative w-100">
             <input
               type={show2 ? "text" : "password"}
