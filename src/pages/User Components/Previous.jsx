@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 const Previous = () => {
   const redirect = useNavigate();
   const token = localStorage.getItem("mb-token");
-  const url = "https://nb-event-server.onrender.com/api/v1/events/previous";
+  const url = "https://mb-events-adedayo.onrender.com/api/v1/events/previous";
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -20,7 +20,7 @@ const Previous = () => {
 
   const getEvents = async () => {
     try {
-      const result = await axios(url, {
+      const result = await axios(`${url}?page=${page}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setIsLoading(false);

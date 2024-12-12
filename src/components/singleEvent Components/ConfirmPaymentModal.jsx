@@ -48,13 +48,15 @@ const ConfirmPaymentModal = ({
         redirect("/your-events/attending");
       }
     } catch (error) {
+
       toast.error(error?.message);
       if (error && error.status === 400) {
-        toast.error(error?.data.response?.data?.message, {
+        toast.error(error?.response?.data?.message, {
           autoClose: 10000,
           position: "top-center",
         });
         setIsLoading(false);
+        setShowModal(false);
       }
       if (error && error.status === 401) {
         toast.error("Session expired, Login");

@@ -11,8 +11,8 @@ import { useNavigate } from "react-router-dom";
 
 const Attending = () => {
   const redirect = useNavigate();
-  const token = localStorage.getItem("mb-token");
-  const url = "https://nb-event-server.onrender.com/api/v1/events/attending";
+  const url = "https://mb-events-adedayo.onrender.com/api/v1/events/attending";
+    const token = localStorage.getItem("mb-token");
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -20,14 +20,17 @@ const Attending = () => {
 
   const getEvents = async () => {
     try {
-      const result = await axios(url, {
+      const result = await axios(`${url}?page=${page}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
+
       setIsLoading(false);
       setEvents(result.data.events);
       setPage(result.data.currentPage);
       setTotalPages(result.data.totalPages);
     } catch (error) {
+
       if (error && error?.status === 401) {
         toast.error("Session Expired, Login");
         localStorage.removeItem("mb-token");
